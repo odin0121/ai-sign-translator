@@ -1,0 +1,29 @@
+<section id="assistant-chat-panel" class="assistant-chat-panel" role="dialog" aria-modal="false" aria-labelledby="assistant-chat-title" hidden>
+    <div class="assistant-chat-header">
+        <div class="assistant-chat-identity">
+            <span class="assistant-chat-avatar" aria-hidden="true">✳</span>
+            <span><strong id="assistant-chat-title">Signa assistant</strong><small>Built-in site help · no external AI service</small></span>
+        </div>
+        <button id="assistant-chat-close" class="assistant-chat-close" type="button" aria-label="Close assistant">&times;</button>
+    </div>
+    <div id="assistant-chat-messages" class="assistant-chat-messages" role="log" aria-live="polite" aria-relevant="additions">
+        <div class="assistant-chat-message assistant-reply">Hi! I can help with camera setup, model choices, sign lessons, recognition, and translation. What would you like to know?</div>
+    </div>
+    <div class="assistant-chat-suggestions" aria-label="Suggested questions">
+        <button type="button" data-assistant-question="How do I get started?">Getting started</button>
+        <button type="button" data-assistant-question="Why is my sign not recognized?">Recognition help</button>
+        <button type="button" data-assistant-question="How do I use Learn signs?">Learn signs</button>
+    </div>
+    <form id="assistant-chat-form" class="assistant-chat-form">
+        <label class="sr-only" for="assistant-chat-input">Ask the Signa assistant</label>
+        <input id="assistant-chat-input" type="text" maxlength="1000" placeholder="Ask a question…" autocomplete="off" required>
+        <button id="assistant-chat-send" type="submit" aria-label="Send question">
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 10h13m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+    </form>
+    <p id="assistant-chat-status" class="assistant-chat-status" role="status" aria-live="polite"></p>
+</section>
+<button id="assistant-chat-toggle" class="assistant-chat-toggle" type="button" aria-haspopup="dialog" aria-controls="assistant-chat-panel" aria-expanded="false">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H6l-3 2v-9.5A7.5 7.5 0 1 1 20 11.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 11h.01M12 11h.01M16 11h.01" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+    <span>Ask Signa</span>
+</button>

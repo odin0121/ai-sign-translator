@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f5f4f0">
+    <meta name="description" content="Learn ASL and ISL signs with recorded examples and camera practice.">
+    <title>Learn signs — Signa</title>
+    {% load static %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/translator.css' %}?v=3.6">
+</head>
+<body class="translator-page learning-page dark-theme">
+    <header class="topbar">
+        <a class="brand" href="{% url 'index' %}" aria-label="Signa home">
+            <span class="sr-only">AI SIGN TRANSLATOR</span>
+            <span class="brand-mark" aria-hidden="true">
+                <svg viewBox="0 0 32 32" fill="none"><path d="M11 16V8.5a2 2 0 0 1 4 0V15m0-2V6a2 2 0 0 1 4 0v9m0-2V8a2 2 0 0 1 4 0v10m0-4a2 2 0 0 1 4 0v4.5A9.5 9.5 0 0 1 17.5 28h-1.2a9 9 0 0 1-6.4-2.7l-4.1-4.1a2.1 2.1 0 0 1 3-3L11 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="brand-copy"><strong>signa<span>.</span></strong><small>LEARNING STUDIO</small></span>
+        </a>
+        <div class="topbar-actions">
+            <label class="sr-only" for="model-profile-select">Choose sign language model</label>
+            <div class="model-picker">
+                <span class="picker-icon" aria-hidden="true">◎</span>
+                <select id="model-profile-select" class="select-lang" aria-label="Sign language model">
+                    <option value="wlasl100" {% if initial_model_profile == "wlasl100" %}selected{% endif %}>ASL · WLASL100</option>
+                    <option value="isl_emergency" {% if initial_model_profile == "isl_emergency" %}selected{% endif %}>ISL — Emergency signs</option>
+                    <option value="asl_alphabet" {% if initial_model_profile == "asl_alphabet" %}selected{% endif %}>ASL Alphabet · A–Z</option>
+                </select>
+                <span class="select-chevron" aria-hidden="true">⌄</span>
+            </div>
+            <span id="model-profile-status" class="model-status">Loading model…</span>
+            <button id="theme-toggle-btn" class="icon-button theme-button" type="button" title="Toggle color theme" aria-label="Toggle color theme">
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg>
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5 8.5 8.5 0 1 0 20.5 15.5Z"></path></svg>
+                <span class="theme-label">Bright</span>
+            </button>
+            <a href="{% url 'index' %}" class="analytics-link">Live Studio</a>
+            <a href="{% url 'dashboard' %}" class="analytics-link">Analytics</a>
+        </div>
+    </header>
+
+    <main class="page-shell learning-shell">
+        <section class="intro-row" aria-labelledby="learning-page-title">
+            <div class="intro-copy">
+                <p class="eyebrow"><span class="eyebrow-dot"></span> LEARN AT YOUR OWN PACE</p>
+                <h1 id="learning-page-title">Practice with<br><span>purpose.</span></h1>
+                <p class="intro-description">Choose a model to explore its signs, watch an example, and open the live studio to practice.</p>
+            </div>
+            <div class="intro-note">
+                <span class="note-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 7.8 7.5 9.5 4.3-1.7 7.5-4.9 7.5-9.5V6L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span><strong>Choose your model</strong><small>ASL words, ASL A–Z, and ISL emergency signs are separate models.</small></span>
+            </div>
+        </section>
+
+        <section class="learning-models" aria-labelledby="learning-models-title">
+            <div class="learning-models-heading">
+                <div>
+                    <p class="eyebrow"><span class="eyebrow-dot"></span> PICK A LEARNING PATH</p>
+                    <h2 id="learning-models-title">Choose a sign language</h2>
+                </div>
+                <span class="learning-models-hint">Lessons and camera practice use the selected model.</span>
+            </div>
+            <div class="learning-model-options" role="group" aria-label="Choose a sign language model">
+                <button class="learning-model-option" type="button" data-model-profile="wlasl100" aria-pressed="false">
+                    <span class="learning-model-mark" aria-hidden="true">ASL</span>
+                    <span class="learning-model-copy">
+                        <strong>ASL word signs</strong>
+                        <small>Practice words from the WLASL100 vocabulary.</small>
+                    </span>
+                    <span class="learning-model-arrow" aria-hidden="true">→</span>
+                </button>
+                <button class="learning-model-option" type="button" data-model-profile="asl_alphabet" aria-pressed="false">
+                    <span class="learning-model-mark" aria-hidden="true">A–Z</span>
+                    <span class="learning-model-copy">
+                        <strong>ASL alphabet</strong>
+                        <small>Learn and practice the 26 letter handshapes.</small>
+                    </span>
+                    <span class="learning-model-arrow" aria-hidden="true">→</span>
+                </button>
+                <button class="learning-model-option" type="button" data-model-profile="isl_emergency" aria-pressed="false">
+                    <span class="learning-model-mark" aria-hidden="true">ISL</span>
+                    <span class="learning-model-copy">
+                        <strong>Indian Sign Language</strong>
+                        <small>Practice emergency signs from the ISL model.</small>
+                    </span>
+                    <span class="learning-model-arrow" aria-hidden="true">→</span>
+                </button>
+            </div>
+        </section>
+
+        {% include "learning_panel.html" %}
+
+        <footer class="page-footer">
+            <div class="footer-brand"><span class="footer-mark">s.</span><span>Made for clearer conversations.</span></div>
+            <div class="footer-status"><span>Choose a sign to begin learning.</span></div>
+        </footer>
+    </main>
+
+    {% include "assistant_chat.html" %}
+    {% csrf_token %}
+    <script src="{% static 'js/assistant-chat.js' %}?v=1.0"></script>
+    <script src="{% static 'js/learning.js' %}?v=1.1"></script>
+</body>
+</html>

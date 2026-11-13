@@ -1,0 +1,23 @@
+# AI Sign Language Translator Requirements
+# Core deep learning & ML stack
+tensorflow>=2.15.0
+keras>=3.0.0
+scikit-learn>=1.4.0
+joblib>=1.3.0
+numpy>=1.24.0,<=2.2.0
+scipy>=1.12.0
+pandas>=2.0.0
+h5py>=3.10.0
+
+# Computer Vision & Landmark Extraction
+opencv-python>=4.8.0
+mediapipe>=0.10.0; python_version < "3.13"
+Pillow>=9.1.0
+
+# Speech Synthesis
+pyttsx3>=2.90
+gTTS>=2.5.0
+
+# Web Framework & Telemetry
+Django>=5.0.0
+requests>=2.31.0

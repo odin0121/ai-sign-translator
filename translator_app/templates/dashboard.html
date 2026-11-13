@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f5f4f0">
+    <title>Analytics — Signa Live Translation Studio</title>
+    {% load static %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/translator.css' %}?v=3.3">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=3.1">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="translator-page dashboard-page dark-theme">
+    <header class="topbar">
+        <a class="brand" href="{% url 'index' %}" aria-label="Signa home">
+            <span class="sr-only">AI SIGN TRANSLATOR</span>
+            <span class="brand-mark" aria-hidden="true">
+                <svg viewBox="0 0 32 32" fill="none"><path d="M11 16V8.5a2 2 0 0 1 4 0V15m0-2V6a2 2 0 0 1 4 0v9m0-2V8a2 2 0 0 1 4 0v10m0-4a2 2 0 0 1 4 0v4.5A9.5 9.5 0 0 1 17.5 28h-1.2a9 9 0 0 1-6.4-2.7l-4.1-4.1a2.1 2.1 0 0 1 3-3L11 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="brand-copy"><strong>signa<span>.</span></strong><small>LIVE TRANSLATION STUDIO</small></span>
+        </a>
+        <div class="topbar-actions">
+            <button id="theme-toggle-btn" class="icon-button theme-button" type="button" title="Toggle color theme" aria-label="Toggle color theme">
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg>
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5 8.5 8.5 0 1 0 20.5 15.5Z"></path></svg>
+                <span class="theme-label">Light</span>
+            </button>
+            <a href="{% url 'index' %}" class="analytics-link">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 16.5V10m7 6.5V4m7 12.5V7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M1.5 17.5h17" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                <span>Live Studio</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="page-shell dashboard-shell">
+        <section class="dashboard-intro" aria-labelledby="dashboard-title">
+            <div>
+                <p class="eyebrow"><span class="eyebrow-dot"></span> INSIGHTS &amp; ACTIVITY</p>
+                <h1 id="dashboard-title">Your studio,<br><span>at a glance.</span></h1>
+                <p class="intro-description">A clear view of recognition performance, sign activity, and recent translation sessions.</p>
+            </div>
+            <div class="dashboard-actions">
+                <a href="/api/export_csv/" class="outline-button" download>
+                    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3v9m0 0 3-3m-3 3L7 9m-3 4v3.5A1.5 1.5 0 0 0 5.5 18h9a1.5 1.5 0 0 0 1.5-1.5V13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Export CSV
+                </a>
+                <a href="/api/export_json/" class="outline-button" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m6.5 5-4 5 4 5m7-10 4 5-4 5m-2-12-3 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Export JSON
+                </a>
+                <button id="refresh-logs-btn" class="outline-button" type="button">Refresh</button>
+                <button id="clear-logs-btn" class="danger-button" type="button">Clear logs</button>
+            </div>
+        </section>
+
+        <section class="metrics-grid" aria-label="Recognition metrics">
+            <article class="metric-card">
+                <div class="metric-topline"><span class="metric-icon lime">↗</span><span class="metric-caption">INFERENCE SPEED</span></div>
+                <div class="metric-value-row"><strong class="metric-value">{{ avg_latency }}<small> ms</small></strong><span class="metric-badge">LIVE AVG</span></div>
+                <p class="metric-hint">Per-frame processing time · target ≤ 50 ms</p>
+            </article>
+            <article class="metric-card">
+                <div class="metric-topline"><span class="metric-icon lavender">◎</span><span class="metric-caption">HELD-OUT ACCURACY</span></div>
+                <div class="metric-value-row">
+                    <strong class="metric-value">{% if test_accuracy is not None %}{{ test_accuracy }}<small>%</small>{% else %}<small>Not measured</small>{% endif %}</strong>
+                    <span class="metric-badge">{% if test_accuracy is not None %}MEASURED{% else %}UNAVAILABLE{% endif %}</span>
+                </div>
+                <p class="metric-hint">ASL WLASL100 · held-out test split</p>
+            </article>
+            <article class="metric-card">
+                <div class="metric-topline"><span class="metric-icon peach">✳</span><span class="metric-caption">AVG. CONFIDENCE</span></div>
+                <div class="metric-value-row"><strong class="metric-value">{{ avg_confidence }}<small>%</small></strong><span class="metric-badge">CALIBRATED</span></div>
+                <p class="metric-hint">Mean confidence across logged predictions</p>
+            </article>
+            <article class="metric-card">
+                <div class="metric-topline"><span class="metric-icon blue">▤</span><span class="metric-caption">TRANSLATION SESSIONS</span></div>
+                <div class="metric-value-row"><strong class="metric-value" id="total-logs-count">{{ total_translations }}</strong><span class="metric-badge">RECORDED</span></div>
+                <p class="metric-hint">Persisted events in your local telemetry</p>
+            </article>
+        </section>
+
+        <section class="charts-grid" aria-label="Recognition charts">
+            <article class="panel chart-card">
+                <div class="chart-heading">
+                    <div><p class="heading-kicker">SIGN ACTIVITY</p><h2>Most recognized signs</h2><p class="panel-helper">Frequency across recorded translation sessions.</p></div>
+                    <span class="chart-tag">TOKEN VOLUME</span>
+                </div>
+                <div class="chart-canvas-wrapper">
+                    <canvas id="frequencyChart" aria-label="Sign detection frequency chart" {% if not total_translations %}hidden{% endif %}></canvas>
+                    {% if not total_translations %}<div class="chart-empty-state">Sign activity will appear here after recognition sessions are recorded.</div>{% endif %}
+                </div>
+            </article>
+            <article class="panel chart-card">
+                <div class="chart-heading">
+                    <div><p class="heading-kicker">EXAMPLE VISUALIZATION</p><h2>Hand landmark attribution</h2><p class="panel-helper">An illustrative view of how landmark contributions can be explored.</p></div>
+                    <span class="chart-tag lavender-tag">ILLUSTRATION</span>
+                </div>
+                <div class="chart-canvas-wrapper"><canvas id="saliencyRadarChart" aria-label="Hand joint saliency radar chart"></canvas></div>
+            </article>
+        </section>
+
+        <section class="panel logs-panel" aria-labelledby="logs-title">
+            <div class="logs-heading">
+                <div>
+                    <p class="heading-kicker">SESSION HISTORY</p>
+                    <h2 id="logs-title">Recent translations</h2>
+                    <p class="panel-helper">Recognition confidence, processing time, and audio feedback for each logged event.</p>
+                </div>
+                <label class="search-wrap">
+                    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.7" cy="8.7" r="5.7" stroke="currentColor" stroke-width="1.5"/><path d="m13 13 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    <span class="sr-only">Search translation history</span>
+                    <input type="text" id="table-search-input" placeholder="Search signs or landmarks…">
+                </label>
+            </div>
+            <div class="table-responsive">
+                <table class="data-table" id="audit-table">
+                    <thead><tr><th>TIME</th><th>SIGN</th><th>CONFIDENCE</th><th>LATENCY</th><th>LANDMARKS</th><th>AUDIO</th></tr></thead>
+                    <tbody id="logs-table-body">
+                        {% for log in recent_logs %}
+                        <tr class="log-row" data-token="{{ log.predicted_token }}">
+                            <td class="mono-cell time-cell">{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+                            <td><span class="sign-pill">{{ log.predicted_token }}</span></td>
+                            <td>
+                                <div class="table-meter-group">
+                                    <div class="table-bar-bg"><div class="table-bar-fill" style="width: {% widthratio log.confidence 1 100 %}%;"></div></div>
+                                    <span class="mono-cell">{% widthratio log.confidence 1 100 %}%</span>
+                                </div>
+                            </td>
+                            <td class="mono-cell {% if log.latency_ms <= 50 %}latency-pass{% else %}latency-warn{% endif %}">{{ log.latency_ms|floatformat:1 }} ms</td>
+                            <td><div class="joint-tags-row">
+                                {% for joint in log.top_contributing_joints %}<span class="joint-pill-badge">{{ joint.joint_name }} · {{ joint.score|floatformat:2 }}</span>
+                                {% empty %}<span class="uniform-label">Uniform</span>{% endfor %}
+                            </div></td>
+                            <td>{% if log.tts_played %}<span class="tag-status success">Spoken</span>{% else %}<span class="tag-status muted">Muted</span>{% endif %}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="6" class="empty-table-msg">No translation sessions yet. Visit the <a href="{% url 'index' %}">Live Studio</a> to start signing.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer class="page-footer">
+            <div class="footer-brand"><span class="footer-mark">s.</span><span>Made for clearer conversations.</span></div>
+            <div class="footer-status"><span class="status-indicator-ready"><span></span> Telemetry updates every few seconds</span></div>
+        </footer>
+    </main>
+
+    {% include "assistant_chat.html" %}
+
+    <script>
+        window.DASHBOARD_DATA = {
+            topSigns: {{ top_signs|safe }},
+            avgLatency: {{ avg_latency }},
+            avgConfidence: {{ avg_confidence }}
+        };
+    </script>
+    {% csrf_token %}
+    <script src="{% static 'js/assistant-chat.js' %}?v=1.0"></script>
+    <script src="{% static 'js/dashboard.js' %}?v=3.1"></script>
+</body>
+</html>

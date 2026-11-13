@@ -1,0 +1,63 @@
+<section id="learning-studio" class="panel learning-panel" aria-labelledby="learning-title">
+    <div class="learning-heading">
+        <div>
+            <div class="heading-kicker"><span class="learning-spark">✳</span> LEARNING STUDIO</div>
+            <h2 id="learning-title">Learn one sign at a time.</h2>
+            <p class="panel-helper">Watch a real example from the selected dataset, then practice it with the live recognizer.</p>
+        </div>
+        <div class="learning-progress">
+            <div class="progress-label"><span>YOUR PROGRESS</span><strong id="learning-progress-label">0 / 0 learned</strong></div>
+            <div class="progress-track"><div id="learning-progress-bar" class="progress-fill" style="width: 0%;"></div></div>
+        </div>
+    </div>
+    <div class="learning-workspace">
+        <aside class="learning-library" aria-label="Sign lessons">
+            <label class="learning-search">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.7" cy="8.7" r="5.7" stroke="currentColor" stroke-width="1.5"/><path d="m13 13 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <span class="sr-only">Search sign lessons</span>
+                <input id="learning-search" type="search" placeholder="Find a sign…" autocomplete="off">
+            </label>
+            <div id="learning-sign-list" class="learning-sign-list" role="group" aria-label="Available sign lessons">
+                <div class="learning-list-empty">Loading sign lessons…</div>
+            </div>
+            <div class="learning-list-footer"><span id="learning-sign-count">Loading signs</span><span>Choose a lesson</span></div>
+        </aside>
+        <div class="learning-detail" aria-live="polite">
+            <div class="learning-demo-stage">
+                <div id="learning-demo-placeholder" class="learning-demo-placeholder">
+                    <span class="demo-play-mark">▶</span>
+                    <strong>Your sign demonstration</strong>
+                    <span>Select a sign to watch a real training example.</span>
+                </div>
+                <video id="learning-demo-video" controls muted loop playsinline preload="none" hidden aria-label="Sign demonstration video"></video>
+                <img id="learning-demo-gif" alt="" hidden>
+                <span id="demo-source-badge" class="demo-source-badge" hidden>TRAINING EXAMPLE</span>
+            </div>
+            <div class="lesson-content">
+                <div class="lesson-title-row">
+                    <div>
+                        <div id="learning-sign-category" class="heading-kicker">SELECT A SIGN</div>
+                        <h3 id="learning-sign-title">Ready when you are</h3>
+                    </div>
+                    <span id="lesson-learned-badge" class="lesson-learned-badge" hidden>LEARNED</span>
+                </div>
+                <p id="learning-sign-description" class="lesson-description">Pick any sign in the list to see its dataset demonstration.</p>
+                <div class="lesson-steps">
+                    <div class="lesson-step"><span>01</span><p><strong>Watch</strong> the example all the way through.</p></div>
+                    <div class="lesson-step"><span>02</span><p><strong>Notice</strong> the hand shape and how it moves.</p></div>
+                    <div class="lesson-step"><span>03</span><p><strong>Try it</strong> in the live camera practice.</p></div>
+                </div>
+                <div id="learning-feedback" class="learning-feedback" role="status">Examples are recordings from training data; signing can vary by person and region.</div>
+                <div class="learning-actions">
+                    <a id="practice-sign-btn" class="primary-button practice-button" href="/" aria-disabled="true">
+                        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2" y="4.5" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="m13 8 5-3v10l-5-3V8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                        Practice with camera
+                    </a>
+                    <button id="mark-learned-btn" class="outline-button mark-learned-button" type="button" disabled>Mark as learned</button>
+                    <button id="next-lesson-btn" class="next-lesson-button" type="button" disabled>Next sign <span aria-hidden="true">→</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <p class="learning-disclaimer">Dataset clips are examples, not a substitute for instruction from fluent signers. Sign language has regional and individual variation. The alphabet model uses still images; J and Z require movement and may not be recognized correctly.</p>
+</section>

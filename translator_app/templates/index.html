@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f5f4f0">
+    <meta name="description" content="A live sign language recognition and translation studio.">
+    <title>Signa — Live Sign Language Studio</title>
+    {% load static %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/translator.css' %}?v=3.4">
+</head>
+<body class="translator-page dark-theme">
+    <header class="topbar">
+        <a class="brand" href="{% url 'index' %}" aria-label="Signa home">
+            <span class="sr-only">AI SIGN TRANSLATOR</span>
+            <span class="brand-mark" aria-hidden="true">
+                <svg viewBox="0 0 32 32" fill="none">
+                    <path d="M11 16V8.5a2 2 0 0 1 4 0V15m0-2V6a2 2 0 0 1 4 0v9m0-2V8a2 2 0 0 1 4 0v10m0-4a2 2 0 0 1 4 0v4.5A9.5 9.5 0 0 1 17.5 28h-1.2a9 9 0 0 1-6.4-2.7l-4.1-4.1a2.1 2.1 0 0 1 3-3L11 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            <span class="brand-copy">
+                <strong>signa<span>.</span></strong>
+                <small>LIVE TRANSLATION STUDIO</small>
+            </span>
+        </a>
+
+        <div class="topbar-actions">
+            <label class="sr-only" for="model-profile-select">Choose sign language model</label>
+            <div class="model-picker">
+                <span class="picker-icon" aria-hidden="true">◎</span>
+                <select id="model-profile-select" class="select-lang" aria-label="Sign language model">
+                    <option value="wlasl100">ASL · WLASL100</option>
+                    <option value="isl_emergency">ISL — Emergency signs</option>
+                    <option value="asl_alphabet">ASL Alphabet · A–Z</option>
+                </select>
+                <span class="select-chevron" aria-hidden="true">⌄</span>
+            </div>
+            <span id="model-profile-status" class="model-status">
+                {% if model_ready %}
+                    {{ test_accuracy }}% held-out accuracy
+                {% else %}
+                    Model not trained
+                {% endif %}
+            </span>
+            <button id="theme-toggle-btn" class="icon-button theme-button" type="button" title="Toggle color theme" aria-label="Toggle color theme">
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg>
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5 8.5 8.5 0 1 0 20.5 15.5Z"></path></svg>
+                <span class="theme-label">Light</span>
+            </button>
+            <a href="{% url 'dashboard' %}" class="analytics-link">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2.5" y="2.5" width="6" height="7" rx="1.5"></rect><rect x="11.5" y="2.5" width="6" height="4" rx="1.5"></rect><rect x="11.5" y="9.5" width="6" height="8" rx="1.5"></rect><rect x="2.5" y="12.5" width="6" height="5" rx="1.5"></rect></svg>
+                <span>Analytics</span>
+            </a>
+            <a href="{% url 'learning_studio' %}" class="analytics-link learning-nav-link">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2.5a7.5 7.5 0 1 0 7.5 7.5A7.5 7.5 0 0 0 10 2.5Z" stroke="currentColor" stroke-width="1.5"/><path d="m8 6.7 5 3.3-5 3.3V6.7Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+                <span>Learn signs</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        <section class="intro-row" aria-labelledby="page-title">
+            <div class="intro-copy">
+                <p class="eyebrow"><span class="eyebrow-dot"></span> A MORE HUMAN WAY TO CONNECT</p>
+                <h1 id="page-title">Words begin<br><span>with a gesture.</span></h1>
+                <p class="intro-description">Sign naturally. See your signs recognized, shaped into a message, and spoken aloud.</p>
+            </div>
+            <div class="intro-note">
+                <span class="note-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 7.8 7.5 9.5 4.3-1.7 7.5-4.9 7.5-9.5V6L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span><strong>Private by design</strong><small>Camera frames are processed for live recognition.</small></span>
+            </div>
+        </section>
+
+        <section class="studio-grid" aria-label="Live sign translation studio">
+            <section class="panel camera-panel" aria-labelledby="camera-title">
+                <div class="panel-heading camera-heading">
+                    <div class="heading-copy">
+                        <div class="heading-kicker"><span class="live-dot"></span> LIVE STUDIO</div>
+                        <h2 id="camera-title">Camera &amp; Vision Studio</h2>
+                    </div>
+                    <div class="camera-heading-actions">
+                        <span id="hud-latency-pill" class="latency-pill">Latency <strong>-- ms</strong></span>
+                        <button id="open-cheatsheet-btn" class="quiet-button" type="button">
+                            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 3.5h8.5A2.5 2.5 0 0 1 15 6v10.5H6.5A2.5 2.5 0 0 1 4 14V3.5Z" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 16.5A2.5 2.5 0 0 1 9 14h6m-8-7h5m-5 3h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                            Sign guide
+                        </button>
+                    </div>
+                </div>
+
+                <div class="camera-stage">
+                    <video id="client-webcam" autoplay playsinline muted></video>
+                    <canvas id="output-canvas" class="live-canvas"></canvas>
+                    <img id="mjpeg-stream" src="" alt="Live camera stream" class="live-canvas">
+                    <div class="stage-vignette" aria-hidden="true"></div>
+                    <div class="stage-corner corner-tl" aria-hidden="true"></div>
+                    <div class="stage-corner corner-tr" aria-hidden="true"></div>
+                    <div class="stage-corner corner-bl" aria-hidden="true"></div>
+                    <div class="stage-corner corner-br" aria-hidden="true"></div>
+
+                    <div class="stage-hud">
+                        <span class="hud-label"><span class="hud-pulse"></span> CAMERA FEED</span>
+                        <div class="hud-stats">
+                            <span id="hud-fps" class="hud-stat"><span class="chip-label">FPS</span><strong class="chip-val">--</strong></span>
+                            <span id="hud-latency" class="hud-stat"><span class="chip-label">TIME</span><strong class="chip-val">-- ms</strong></span>
+                        </div>
+                    </div>
+                    <div id="hand-status-chip" class="hand-status-chip">No hand detected</div>
+
+                    <div id="idle-prompt" class="idle-overlay">
+                        <div class="idle-content">
+                            <div class="idle-art" aria-hidden="true">
+                                <span class="art-orbit orbit-one"></span><span class="art-orbit orbit-two"></span>
+                                <svg viewBox="0 0 56 56" fill="none"><path d="M18 29V15a3 3 0 0 1 6 0v12-17a3 3 0 0 1 6 0v17-14a3 3 0 0 1 6 0v15-10a3 3 0 0 1 6 0v13c0 9-5 15-14 15h-2c-5 0-8-2-11-5l-7-8a3.1 3.1 0 0 1 4.8-3.9L18 35" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </div>
+                            <p class="idle-overline">YOUR STUDIO IS READY</p>
+                            <h3>Bring your hands into view</h3>
+                            <p>Start your camera and sign in front of it. Keep your hands well lit and fully inside the frame.</p>
+                            <button id="start-btn-quick" class="primary-button quick-start" type="button">
+                                <span class="button-play" aria-hidden="true">▶</span> Start live camera
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="camera-toolbar">
+                    <button id="toggle-camera-btn" class="primary-button camera-toggle" type="button">
+                        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2" y="4.5" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="m13 8 5-3v10l-5-3V8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                        <span>Start Camera</span>
+                    </button>
+                    <div class="toolbar-hint"><span class="keyboard-hint">TIP</span> Face a light source for clearer hand tracking.</div>
+                    <label class="sound-toggle">
+                        <input type="checkbox" id="audio-chime-chk" checked>
+                        <span class="toggle-track"><span></span></span>
+                        <span>Sound cues</span>
+                    </label>
+                </div>
+                <p id="practice-session-notice" class="practice-session-notice" role="status" hidden>
+                    <span class="practice-session-icon" aria-hidden="true">◎</span>
+                    <span id="practice-session-status"></span>
+                </p>
+            </section>
+
+            <aside class="right-rail">
+                <section class="panel recognition-panel" aria-labelledby="recognition-title">
+                    <div class="panel-heading compact-heading">
+                        <div>
+                            <div class="heading-kicker">RECOGNITION</div>
+                            <h2 id="recognition-title">Detected sign</h2>
+                        </div>
+                        <span id="confidence-badge" class="confidence-badge">0% confidence</span>
+                    </div>
+                    <div class="recognition-result">
+                        <span class="result-label">CURRENT GESTURE</span>
+                        <div id="active-token" class="token-display">READY</div>
+                        <div class="confidence-track" aria-label="Prediction confidence">
+                            <div id="confidence-bar" class="confidence-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="confidence-scale"><span>Confidence</span><span>High confidence at model threshold</span></div>
+                    </div>
+                    <div class="candidate-area">
+                        <div class="subsection-label">OTHER POSSIBILITIES</div>
+                        <div class="candidates-row" id="candidates-container">
+                            <span class="cand-placeholder">Position your hand clearly in the frame to begin.</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel vocabulary-panel" aria-labelledby="vocab-title">
+                    <div class="panel-heading compact-heading vocab-heading">
+                        <div>
+                            <div class="heading-kicker">MODEL VOCABULARY</div>
+                            <h2 id="vocab-title">SUPPORTED SIGNS ({{ total_classes }} CLASSES)</h2>
+                        </div>
+                        <span class="vocab-count">{{ total_classes }}</span>
+                    </div>
+                    <p class="panel-helper">Explore the signs this model can recognize.</p>
+                    <div id="vocab-chips-cloud" class="vocab-chips-cloud">
+                        {% for word in vocabulary %}
+                            <button class="vocab-chip" type="button" data-token="{{ word }}">{{ word }}</button>
+                        {% empty %}
+                            <span class="vocab-empty">Vocabulary is loading…</span>
+                        {% endfor %}
+                    </div>
+                    <p class="vocab-footnote">Select a sign to add it to your message.</p>
+                </section>
+            </aside>
+        </section>
+
+        <section class="lower-grid" aria-label="Message and model explanation">
+            <section class="panel composer-panel" aria-labelledby="composer-title">
+                <div class="panel-heading compact-heading">
+                    <div>
+                        <div class="heading-kicker">YOUR MESSAGE</div>
+                        <h2 id="composer-title">Build a sentence</h2>
+                    </div>
+                    <div class="composer-actions">
+                        <button id="copy-sentence-btn" class="icon-button small-icon-button" type="button" title="Copy message" aria-label="Copy message">
+                            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="7" y="6" width="10" height="11" rx="1.7" stroke="currentColor" stroke-width="1.5"/><path d="M13 6V4.8A1.8 1.8 0 0 0 11.2 3H4.8A1.8 1.8 0 0 0 3 4.8v7.4A1.8 1.8 0 0 0 4.8 14H7" stroke="currentColor" stroke-width="1.5"/></svg>
+                        </button>
+                        <button id="clear-sentence-btn" class="text-button" type="button">Clear</button>
+                    </div>
+                </div>
+                <div class="sentence-editor" id="sentence-text" contenteditable="true" role="textbox" aria-label="Translated message" aria-multiline="true" data-placeholder="Recognized signs will appear here. You can also type or edit your message."></div>
+                <div class="sentence-tools">
+                    <div class="edit-actions">
+                        <button id="add-space-btn" class="outline-button" type="button">Add space</button>
+                        <button id="backspace-btn" class="outline-button" type="button">Undo last character</button>
+                    </div>
+                    <div class="speech-actions">
+                        <button id="speak-sentence-btn" class="outline-button speak-button" type="button">
+                            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M9 4 5 7H2.5v6H5l4 3V4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 7a4 4 0 0 1 0 6m2.5-8.5a7.5 7.5 0 0 1 0 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                            Speak
+                        </button>
+                        <div id="tts-wave-anim" class="sound-wave-anim" style="display: none;" aria-hidden="true"><span class="wave-bar"></span><span class="wave-bar"></span><span class="wave-bar"></span><span class="wave-bar"></span></div>
+                    </div>
+                </div>
+                <div class="translate-row">
+                    <div class="translate-label"><span class="translate-sparkle">✳</span><span>Translate message</span></div>
+                    <div class="translation-controls">
+                        <label class="sr-only" for="target-lang-select">Target language</label>
+                        <select id="target-lang-select" class="target-language">
+                            <option value="English">English</option>
+                            <option value="Spanish">Spanish</option>
+                            <option value="French">French</option>
+                            <option value="German">German</option>
+                            <option value="Hindi">Hindi</option>
+                        </select>
+                        <button id="translate-sentence-btn" class="translate-button" type="button">Translate <span aria-hidden="true">→</span></button>
+                    </div>
+                </div>
+                <div class="composer-footer">
+                    <label class="auto-speak-container">
+                        <input type="checkbox" id="auto-speak-chk" checked>
+                        <span class="checkmark"></span>
+                        <span class="auto-speak-label">Speak recognized signs automatically</span>
+                    </label>
+                    <div id="translation-preview-badge" class="translation-preview-badge" style="display: none;"></div>
+                </div>
+            </section>
+
+            <section class="panel explanation-panel" aria-labelledby="explanation-title">
+                <div class="panel-heading compact-heading">
+                    <div>
+                        <div class="heading-kicker">A CLOSER LOOK</div>
+                        <h2 id="explanation-title">What shaped this result?</h2>
+                    </div>
+                    <span class="explain-tag">MODEL EXPLANATION</span>
+                </div>
+                <p class="panel-helper">Hand landmarks that contributed most to the current recognition.</p>
+                <div id="xai-joints-list" class="joints-grid">
+                    <div class="joint-item empty"><span>Sign in front of the camera to see the hand landmarks behind a prediction.</span></div>
+                </div>
+                <div class="explanation-legend"><span class="legend-dot"></span> Stronger highlight means greater contribution</div>
+            </section>
+        </section>
+
+        <footer class="page-footer">
+            <div class="footer-brand"><span class="footer-mark">s.</span><span>Made for clearer conversations.</span></div>
+            <div class="footer-status"><span id="socket-status" class="status-indicator-ready"><span></span> Recognition studio ready</span><span class="footer-divider">·</span><span>TCN · Transformer · SVM</span></div>
+        </footer>
+    </main>
+
+    <div id="cheatsheet-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="guide-title">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div><p class="heading-kicker">QUICK START</p><h2 id="guide-title">A few tips for a clearer read</h2></div>
+                <button id="close-modal-btn" class="btn-close" type="button" aria-label="Close guide">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="guide-steps">
+                    <div class="guide-step"><span>01</span><div><strong>Choose your model</strong><p>Select ASL words, ASL A–Z letters, or the ISL emergency-sign vocabulary.</p></div></div>
+                    <div class="guide-step"><span>02</span><div><strong>Frame your hands</strong><p>Keep your hands fully visible, centered, and well lit.</p></div></div>
+                    <div class="guide-step"><span>03</span><div><strong>Sign at a natural pace</strong><p>Hold each gesture briefly so the model can follow the movement.</p></div></div>
+                    <div class="guide-note"><strong>About recognition</strong><p>This studio recognizes signs from the selected model's supported vocabulary. Predictions can be uncertain; check the confidence indicator and verify important messages.</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include "assistant_chat.html" %}
+
+    {% csrf_token %}
+    <script src="{% static 'js/assistant-chat.js' %}?v=1.0"></script>
+    <script src="{% static 'js/stream.js' %}?v=3.4"></script>
+</body>
+</html>
