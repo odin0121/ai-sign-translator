@@ -295,6 +295,9 @@ class SignTranslationPipeline:
     and inference latency tracking.
     """
     _instances = {}
+    # Saliency changes much more slowly than the prediction. Refresh its
+    # gradient attribution periodically and reuse it for the intervening frames.
+    XAI_REFRESH_INTERVAL = 5
 
     @classmethod
     def get_instance(cls, model_profile="wlasl100"):
@@ -386,6 +389,7 @@ class SignTranslationPipeline:
 
         # Runtime telemetry cache
         self.total_frames = 0
+        self.inference_frame_count = 0
         self.last_latency = 0.0
         self.last_prediction = "READY"
         self.last_confidence = 0.0
@@ -413,15 +417,26 @@ class SignTranslationPipeline:
         seq_window = np.array(self.feature_buffer, dtype=np.float32)
         seq_tensor = np.expand_dims(seq_window, axis=0)
 
-        # Step 3 & 4: Inference + XAI Saliency Backprop
+        # Step 3: Run the model every frame. Refresh expensive gradient-based
+        # saliency every few frames and reuse the latest attribution meanwhile.
         if (
             self.extractor.has_detection
             and self.model_ready
             and self.valid_frame_count >= MIN_VALID_SEQUENCE_FRAMES
         ):
-            saliency, latent = self.explainer.compute_saliency(seq_tensor)
-            if detected_hands == 1 and len(saliency) > len(JOINT_NAMES):
-                saliency[len(JOINT_NAMES):] = 0.0
+            self.inference_frame_count = getattr(self, "inference_frame_count", 0) + 1
+            cached_saliency = getattr(self, "last_saliency", None)
+            refresh_saliency = (
+                cached_saliency is None
+                or self.inference_frame_count % self.XAI_REFRESH_INTERVAL == 1
+            )
+            if refresh_saliency:
+                saliency, latent = self.explainer.compute_saliency(seq_tensor)
+                if detected_hands == 1 and len(saliency) > len(JOINT_NAMES):
+                    saliency[len(JOINT_NAMES):] = 0.0
+            else:
+                latent = self.hybrid_nn.extract_latent(seq_tensor)
+                saliency = cached_saliency
             
             # Predict with probability distribution
             if hasattr(self.svm.svm, "predict_proba"):
@@ -432,8 +447,21 @@ class SignTranslationPipeline:
                     # Exponential Moving Average filter across frames (0.65 current, 0.35 historical)
                     self.smoothed_probs = 0.65 * curr_probs + 0.35 * self.smoothed_probs
 
-                pred_idx = int(np.argmax(self.smoothed_probs))
-                confidence = float(self.smoothed_probs[pred_idx])
+                if hasattr(self.svm.svm, "predict"):
+                    pred_idx = int(self.svm.svm.predict(latent)[0])
+                else:
+                    pred_idx = int(np.argmax(self.smoothed_probs))
+                class_ids = getattr(self.svm.svm, "classes_", None)
+                class_position = (
+                    np.flatnonzero(class_ids == pred_idx)
+                    if class_ids is not None
+                    else np.asarray([], dtype=np.int64)
+                )
+                confidence = float(
+                    self.smoothed_probs[class_position[0]]
+                    if len(class_position)
+                    else self.smoothed_probs[pred_idx]
+                )
                 pred_label = self.svm.vocabulary[pred_idx] if pred_idx < len(self.svm.vocabulary) else f"CLASS_{pred_idx}"
 
                 top3_indices = np.argsort(self.smoothed_probs)[::-1][:3]
@@ -458,6 +486,8 @@ class SignTranslationPipeline:
             saliency = np.zeros(self.extractor.feature_dim // 3, dtype=np.float32)
             if self.valid_frame_count < MIN_VALID_SEQUENCE_FRAMES:
                 self.smoothed_probs = None
+                self.inference_frame_count = 0
+                self.last_saliency = None
             pred_label = (
                 "MODEL NOT TRAINED"
                 if self.extractor.has_detection and not self.model_ready

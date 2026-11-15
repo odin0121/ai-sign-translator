@@ -146,7 +146,7 @@ def main():
     )
 
     val_probs = classifier.svm.predict_proba(val_latent)
-    val_predictions = classifier.svm.classes_[np.argmax(val_probs, axis=1)]
+    val_predictions = classifier.svm.predict(val_latent)
     val_confidence = np.max(val_probs, axis=1)
     target_coverage = 0.70
     candidates = []
@@ -165,7 +165,7 @@ def main():
 
     results = classifier.evaluate(test_latent, y_test)
     test_probs = classifier.svm.predict_proba(test_latent)
-    test_predictions = classifier.svm.classes_[np.argmax(test_probs, axis=1)]
+    test_predictions = classifier.svm.predict(test_latent)
     accepted_test = np.max(test_probs, axis=1) >= min_confidence
     test_coverage = float(np.mean(accepted_test))
     test_selective_accuracy = (

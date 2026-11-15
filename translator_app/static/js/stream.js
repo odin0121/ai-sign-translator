@@ -518,13 +518,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Sentence formulation with debounce & chime (50% threshold for real-world reliability)
-        const minimumConfidence = Number.isFinite(data.min_confidence)
-            ? data.min_confidence
-            : 0.5;
+        const minimumConfidence = 0.5;
+        const confidentReading = (data.confidence || 0) > minimumConfidence
+            && token !== 'UNCERTAIN';
         if (practiceTargetToken) {
-            if (token === practiceTargetToken && (data.confidence || 0) >= minimumConfidence) {
+            if (token === practiceTargetToken && confidentReading) {
                 if (practiceStatus) practiceStatus.textContent = `Recognized ${practiceTargetToken}. Compare your hand shape with the example.`;
-            } else if ((data.confidence || 0) >= minimumConfidence) {
+            } else if (confidentReading) {
                 if (practiceStatus) practiceStatus.textContent = `The model currently reads ${token}. Review the example for ${practiceTargetToken} and try again.`;
             } else {
                 if (practiceStatus) practiceStatus.textContent = `Keep practicing ${practiceTargetToken}; the current reading is uncertain.`;
@@ -534,7 +534,7 @@ document.addEventListener('DOMContentLoaded', () => {
             lastCommittedToken = null;
             return;
         }
-        if ((data.confidence || 0) >= minimumConfidence) {
+        if (confidentReading) {
             if (token === lastStableToken) {
                 tokenStreak++;
                 if (tokenStreak >= STREAK_THRESHOLD && token !== lastCommittedToken) {

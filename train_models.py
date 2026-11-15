@@ -133,11 +133,18 @@ def main():
     train_latent = model.extract_latent(X_train)
     val_latent = model.extract_latent(X_val)
     test_latent = model.extract_latent(X_test)
-    classifier = SVMSignClassifier(c_param=10.0, kernel="rbf", vocabulary=vocabulary)
+    # Validation search favored standardized embeddings with C=3 and gamma=scale.
+    classifier = SVMSignClassifier(
+        c_param=3.0,
+        kernel="rbf",
+        gamma="scale",
+        standardize=True,
+        vocabulary=vocabulary,
+    )
     classifier.fit(train_latent, y_train, training_source="wlasl100")
 
     val_probs = classifier.svm.predict_proba(val_latent)
-    val_predictions = classifier.svm.classes_[np.argmax(val_probs, axis=1)]
+    val_predictions = classifier.svm.predict(val_latent)
     val_confidence = np.max(val_probs, axis=1)
     thresholds = np.arange(0.01, 0.201, 0.01)
     target_coverage = 0.60
@@ -164,7 +171,7 @@ def main():
 
     results = classifier.evaluate(test_latent, y_test)
     test_probs = classifier.svm.predict_proba(test_latent)
-    test_predictions = classifier.svm.classes_[np.argmax(test_probs, axis=1)]
+    test_predictions = classifier.svm.predict(test_latent)
     test_confidence = np.max(test_probs, axis=1)
     accepted_test = test_confidence >= min_confidence
     selective_accuracy = (

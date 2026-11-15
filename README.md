@@ -44,7 +44,9 @@ python train_asl_alphabet.py --archive /path/to/asl-alphabet.zip
 
 The scripts create landmark caches under `weights/`; these are ignored by Git.
 The training scripts report their held-out metrics. Validation scores should
-not be treated as a guarantee of live-camera performance.
+not be treated as a guarantee of live-camera performance. See
+[DATASET_GUIDE.md](DATASET_GUIDE.md) for accepted formats, data collection
+needs, evaluation guidance, and current recognition limits.
 
 ## Tests
 

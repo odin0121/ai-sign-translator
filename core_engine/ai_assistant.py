@@ -322,7 +322,7 @@ class AIAssistantEngine:
             return (
                 "Use the selected model’s held-out accuracy shown beside the model selector as a "
                 "dataset benchmark, not a promise of camera accuracy. Previously measured "
-                "benchmarks are 46.0% top-1 for ASL/WLASL100 (100 test clips) and 91.25% for ISL "
+                "benchmarks are 63.0% top-1 for ASL/WLASL100 (100 test clips) and 91.25% for ISL "
                 "Emergency (80 signer-independent test clips). The confidence indicator can flag "
                 "uncertain predictions, but it does not guarantee a prediction is correct."
             )

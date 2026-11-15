@@ -474,7 +474,7 @@ class TranslatorAppTests(TestCase):
         with self.assertRaisesRegex(RuntimeError, "has not been trained"):
             classifier.predict(np.zeros(128, dtype=np.float32))
 
-    def test_svm_prediction_and_evaluation_use_the_probability_winner(self):
+    def test_svm_prediction_and_evaluation_use_the_margin_winner(self):
         class ProbabilityModel:
             classes_ = np.asarray([0, 1])
 
@@ -494,8 +494,8 @@ class TranslatorAppTests(TestCase):
             np.asarray([0, 1]),
         )
 
-        self.assertEqual(label, "B")
-        self.assertEqual(confidence, 0.9)
+        self.assertEqual(label, "A")
+        self.assertEqual(confidence, 0.1)
         self.assertEqual(candidates[0][0], "B")
         self.assertEqual(evaluation["accuracy"], 0.5)
 
